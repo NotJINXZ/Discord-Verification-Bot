@@ -104,7 +104,7 @@ async def log_action(server_id, action, user=None, description=None):
         username = "N/A"
         user_id = "N/A"
     else:
-        username = f"{user.username}#{user.discrim}"
+        username = f"{user.name}#{user.discriminator}"
         user_id = user.id
     embed = discord.Embed()
     embed.title = f"Verification Bot Logs - {action}"
@@ -380,7 +380,7 @@ async def howto(ctx):
 async def on_command_error(ctx, error):
     if isinstance(error, MissingRequiredArgument):
         if error.param.name == "channel":
-            embed = error_embed("Channel is a required argument. Example: `PREFIXsetup #channel`")
+            embed = error_embed("Channel is a required argument. Example: `?command #channel`")
             await ctx.send(embed=embed)
     elif isinstance(error, (HTTPException, Forbidden)):
         # Rate limiting handling
@@ -393,7 +393,7 @@ async def on_command_error(ctx, error):
         traceback.print_exc()  # Print detailed traceback to console
 
         embed = error_embed(error_message)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
         raise error
 
 @bot.command()
