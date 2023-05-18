@@ -109,7 +109,7 @@ async def log_action(server_id, action, user=None, description=None):
     embed = discord.Embed()
     embed.title = f"Verification Bot Logs - {action}"
     if description is not None:
-        timestamp = datetime.now().timestamp()
+        timestamp = datetime.datetime.now().timestamp()
         formatted_timestamp = int(timestamp)
         embed.description = f"{description}\n\nAction executed at: <t:{formatted_timestamp}:F>\nAction executed by {username} ({user_id})"
     
