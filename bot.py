@@ -14,6 +14,8 @@ import os
 import datetime
 import itertools
 import asyncio
+import aiohttp
+import re
 
 # CONFIG
 from config import *
@@ -113,7 +115,8 @@ async def log_action(server_id, action, user=None, description=None):
         formatted_timestamp = int(timestamp)
         embed.description = f"{description}\n\nAction executed at: <t:{formatted_timestamp}:F>\nAction executed by {username} ({user_id})"
     
-    webhook = discord.Webhook.from_url(webhook_url)
+    session = aiohttp.ClientSession()
+    webhook = discord.Webhook.from_url(webhook_url, session=session)
     await webhook.send(embed=embed, username=f"{application_name} - Logging")
     return True
 
@@ -301,13 +304,13 @@ async def verify(interaction: Interaction, member: discord.Member = None):
                     embed = success_embed(f"Verified role has been applied to the user: {user.mention} ({user.id})")
                     await interaction.response.send_message(embed=embed, ephemeral=True)
                     # Log the action with staff user
-                    await log_action(server_id, "verify", user=interaction.user, description="User verification executed by staff")
+                    await log_action(server_id, "Successful Verification", user=interaction.user, description="User verification executed by staff")
                 else:
                     await user.add_roles(verified_role, reason="Verified role applied by member")
                     embed = success_embed(f"You have been successfully verified.")
                     await interaction.response.send_message(embed=embed, ephemeral=True)
                     # Log the action with member user
-                    await log_action(server_id, "verify", user=user, description="User verification executed by member")
+                    await log_action(server_id, "Successful Verification", user=user, description="User verification executed by member")
             else:
                 embed = error_embed("The user could not be found. Please make sure the ID is correct.")
                 await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -346,18 +349,41 @@ async def config_staffrole(interaction: discord.Interaction, role: discord.Role)
     embed = success_embed(f"Successfully linked the role: {role.mention}.")
     await interaction.response.send_message(embed=embed)
 
+def is_valid_webhook(webhook: str) -> bool:
+    # This is broken so for now it returns True 24/7
+
+    # # Check if the URL starts with the correct prefix
+    # if not webhook.startswith("https://discord.com/api/webhooks/"):
+    #     return False
+
+    # # Split the URL and retrieve the webhook ID and token
+    # parts = webhook.split("/")
+    # if len(parts) != 7:
+    #     return False
+
+    # # Check if the webhook ID and token are alphanumeric
+    # webhook_id = parts[-2]
+    # webhook_token = parts[-1]
+    # if not webhook_id.isalnum() or not webhook_token.isalnum():
+    #     return False
+
+    return True
+
 @bot.tree.command(name="config_logswebhook")
 @app_commands.commands.describe(webhook="The webhook that will be used for logging purposes.")
 async def config_logswebhook(interaction: discord.Interaction, webhook: str):
     if not interaction.user.guild_permissions.administrator:
-        embed = error_embed("You do not have permission to run this command.")
-        await interaction.response.send_message(embed=embed, delete_after=10)
+        await interaction.response.send_message(embed=error_embed("You do not have permission to run this command."), delete_after=10)
+        return
+
+    if not is_valid_webhook(webhook):
+        await interaction.response.send_message(embed=error_embed("Invalid webhook format."), ephemeral=True)
         return
 
     set_logging_webhook(str(interaction.guild.id), str(webhook))
 
-    embed = success_embed(f"Successfully set the logging webhook to:\n{webhook}")
-    await interaction.response.send_message(embed=embed, ephemeral=True)
+    await interaction.response.send_message(embed=success_embed(f"Successfully set the logging webhook to:\n{webhook}"), ephemeral=True)
+    return
 
 @bot.tree.command(name="invite", description="Get an invite link for the bot!")
 async def invite_command(interaction: discord.Interaction):
