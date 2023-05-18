@@ -74,9 +74,9 @@ async def on_ready():
     print("Server Count: {}".format(len(bot.guilds)))
     print("Member Count: {}".format(sum(len(guild.members) for guild in bot.guilds)))
 
-    for shard_id in bot.shard_ids:
-        print("Shard ID: {}".format(shard_id))
-        print("Shard Count: {}".format(bot.shard_count))
+    # for shard_id in bot.shard_ids:
+    #     print("Shard ID: {}".format(shard_id))
+    #     print("Shard Count: {}".format(bot.shard_count))
 
     print("Bot is ready!")
 
@@ -133,9 +133,7 @@ async def sync(ctx):
 
 @bot.tree.command(name="init", description="Create JSON data for a guild")
 async def initcmd(interaction: discord.Interaction):
-    owner_id = int(owner_id)
-
-    if interaction.user.id != owner_id:
+    if interaction.user.id != int(owner_id):
         embed = error_embed("Sorry, you do not have permission to use this command.")
         await interaction.response.send_message(embed=embed, ephemeral=True)
         return
