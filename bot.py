@@ -113,7 +113,7 @@ async def log_action(server_id, action, user=None, description=None):
         formatted_timestamp = int(timestamp)
         embed.description = f"{description}\n\nAction executed at: <t:{formatted_timestamp}:F>\nAction executed by {username} ({user_id})"
     
-    webhook = discord.Webhook.from_url(webhook_url, adapter=discord.AsyncWebhookAdapter())
+    webhook = discord.Webhook.from_url(webhook_url)
     await webhook.send(embed=embed, username=f"{application_name} - Logging")
     return True
 
