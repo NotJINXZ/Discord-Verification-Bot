@@ -325,7 +325,7 @@ async def verify(interaction: Interaction, member: discord.Member = None):
 async def config_verifiedrole(interaction: discord.Interaction, role: discord.Role):
     if not interaction.user.guild_permissions.administrator:
         embed = error_embed("You do not have permission to run this command.")
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, delete_after=10)
         return
 
     set_verified_role_id(str(interaction.guild.id), str(role.id))
@@ -338,7 +338,7 @@ async def config_verifiedrole(interaction: discord.Interaction, role: discord.Ro
 async def config_staffrole(interaction: discord.Interaction, role: discord.Role):
     if not interaction.user.guild_permissions.administrator:
         embed = error_embed("You do not have permission to run this command.")
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, delete_after=10)
         return
 
     set_staff_role_id(str(interaction.guild.id), str(role.id))
@@ -351,13 +351,13 @@ async def config_staffrole(interaction: discord.Interaction, role: discord.Role)
 async def config_logswebhook(interaction: discord.Interaction, webhook: str):
     if not interaction.user.guild_permissions.administrator:
         embed = error_embed("You do not have permission to run this command.")
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, delete_after=10)
         return
 
     set_logging_webhook(str(interaction.guild.id), str(webhook))
 
     embed = success_embed(f"Successfully set the logging webhook to:\n{webhook}")
-    await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.tree.command(name="invite", description="Get an invite link for the bot!")
 async def invite_command(interaction: discord.Interaction):
