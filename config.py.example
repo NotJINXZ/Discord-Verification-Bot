@@ -1,0 +1,5 @@
+application_name = "Auth Bot"
+bot_developer = "JINXZ"
+token = "YOUR_BOT_TOKEN_HERE"
+base_url = "https://api.jinxz.dev"
+auth_token = "YOUR_API_AUTH_TOKEN"
