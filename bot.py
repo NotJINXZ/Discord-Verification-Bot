@@ -541,4 +541,21 @@ async def setup(ctx):
     reply_message += "\n\nYou can use `?howto` to send an embed."
 
     await ctx.send(reply_message)
+
+@bot.tree.command(name="help", description="Display a list of commands")
+async def help(interaction: discord.Interaction):
+    embed = discord.Embed()
+    embed.description = """Slash Commands:
+</verify:1107825122947104828> - Get verified
+</invite:1108449958429982720> - Get a bot invite link
+</config_verfiedrole:1108369164361535560> - Set the server's verified role
+</config_staffrole:1108376766059384992> - Set the server's staff role
+</config_logswebhook:1108834646231351418> - Set a webhook to be used for logging
+
+Other Commands:
+?howto - Display an embed telling users how to verify
+?setup #channel - Set permissions (This command is risky and may expose private channels. Use at own risk)"""
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+    return
 bot.run(token)
