@@ -1,5 +1,10 @@
-application_name = "Auth Bot"
-bot_developer = "JINXZ"
-token = "YOUR_BOT_TOKEN_HERE"
-base_url = "https://api.jinxz.dev"
-auth_token = "YOUR_API_AUTH_TOKEN"
+application_name = "Auth Bot" # Application name (Will show on embeds)
+bot_developer = "JINXZ" # Bot developer username (Will also show on embeds)
+token = "YOUR_BOT_TOKEN_HERE" # Bot Token
+base_url = "https://api.jinxz.dev" # Api base url
+auth_token = "YOUR_API_AUTH_TOKEN" # Backend authentication header token
+owner_id = "1037376739296432210" # Replace with your owner id
+# Status configuration
+statuses = ["github.com/NotJINXZ", "/verify", "Best verification bot!"]  # You may have as many statuses as you like. (It switches every 60s)
+status_type = "streaming"  # Choose the desired status type: competing, playing, streaming, listening, watching
+streaming_url = "https://www.twitch.tv/its_jinxz"  # Replace with your streaming URL if applicable
