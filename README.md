@@ -30,7 +30,7 @@ The bot supports the following commands:
 - `?setup`: Runs the setup process for channel permissions (admin-only).
 - `/invite`: Get an invite link for the bot.
 
-Additionally, the bot handles slash commands for verification (`/verify`) and configuration (`/config_verifiedrole`, `/config_staffrole`).
+Additionally, the bot handles slash commands for verification (`/verify`) and configuration (`/config_verifiedrole`, `/config_staffrole`, `/config_log).
 
 Please note that the API endpoints and configuration options must be properly set up for the bot to function correctly.
 
