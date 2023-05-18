@@ -147,14 +147,14 @@ async def verify(interaction: Interaction, member: discord.Member = None):
         pass
 
     if verified_role in user.roles:
-        embed = error_embed(f"The user {user.mention} is already verified. Contact a server staff is this is an error.")
+        embed = error_embed(f"The user {user.mention} is already verified. Contact a server staff member if this is an error.")
         await interaction.response.send_message(embed=embed, ephemeral=True)
         return
 
 
     if response.status_code != 200 or renabled == 1 and staffgrant is False:
         if response.status_code == 404 or renabled == 1:
-            # Prepare headers with authentication and Discord ID
+            # Prepare headers with authentication, Discord ID and Server ID
             headers = {
                 'Authorization': auth_token,
                 'Discord-Id': str(user_id),
@@ -190,7 +190,7 @@ async def verify(interaction: Interaction, member: discord.Member = None):
     requests.post(url=delete_url, headers={'Authorization': auth_token, "token": rtoken})
 
     if rserver_id != server_id:
-        embed = error_embed("Server ID does not match. Please contact a developer.")
+        embed = error_embed("Server ID does not match. This usually occurs when you haven't finished verifying in a different server. It can usually be fixed by rerunning the command. If the problem persists, contact a developer.")
         await interaction.response.send_message(embed=embed, ephemeral=True)
         return
 
