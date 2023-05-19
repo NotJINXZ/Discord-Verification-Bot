@@ -8,7 +8,7 @@ def save_data(data):
     with open("data.json", "w") as json_file:
         json.dump(data, json_file)
 
-def create_or_update_entry(server_id, staff_role_id="", verified_role_id="", premium=False, logging_webhook=""):
+def create_or_update_entry(server_id, staff_role_id="", verified_role_id="", premium=False, logging_webhook="", status=True):
     # Load existing data from the JSON file
     with open("data.json", "r") as json_file:
         existing_data = json.load(json_file)
@@ -18,7 +18,8 @@ def create_or_update_entry(server_id, staff_role_id="", verified_role_id="", pre
         "staff_role_id": staff_role_id,
         "verified_role_id": verified_role_id,
         "premium": premium,
-        "logging_webhook": logging_webhook
+        "logging_webhook": logging_webhook,
+        "status": status
     }
 
     # Write the updated data back to the JSON file
@@ -70,6 +71,12 @@ def set_premium_status(server_id, premium_status):
 def set_logging_webhook(server_id, logging_webhook):
     data = get_data()
     data[server_id]["logging_webhook"] = logging_webhook
+    save_data(data)
+
+def set_status(server_id: str | int, status: bool):
+    server_id = str(server_id)
+    data = get_data()
+    data[server_id]["status"] = status
     save_data(data)
 
 def get_logging_webhook_value(server_id):

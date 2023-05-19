@@ -552,6 +552,7 @@ async def help(interaction: discord.Interaction):
 </config_verifiedrole:1108369164361535560> - Set the server's verified role
 </config_staffrole:1108376766059384992> - Set the server's staff role
 </config_logswebhook:1108834646231351418> - Set a webhook to be used for logging
+</status:1108932074687172689> - Change the status of the verification system. (Enable/Disable it)
 
 Other Commands:
 ?howto - Display an embed telling users how to verify
@@ -559,4 +560,18 @@ Other Commands:
 
     await interaction.response.send_message(embed=embed, ephemeral=True)
     return
+
+@bot.tree.command(name="status", description="Enable / Disable the verification system.")
+@app_commands.describe(status = "True = Enable, False = Disable")
+async def status(interaction: discord.Interaction, status: bool):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message(embed=error_embed("You do not have permission to run this command."), delete_after=10)
+        return
+    set_status(interaction.guild.id, status)
+    text = "enabled" if status else "disabled"
+    embed = success_embed(f"Successfully {text} the verification system.")
+    await interaction.response.send_message(embed=embed)
+    return
+
+
 bot.run(token)
