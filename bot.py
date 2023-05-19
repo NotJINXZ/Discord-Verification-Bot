@@ -118,6 +118,7 @@ async def log_action(server_id, action, user=None, description=None):
     session = aiohttp.ClientSession()
     webhook = discord.Webhook.from_url(webhook_url, session=session)
     await webhook.send(embed=embed, username=f"{application_name} - Logging")
+    session.close()
     return True
 
 
