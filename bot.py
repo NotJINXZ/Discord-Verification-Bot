@@ -548,7 +548,7 @@ async def help(interaction: discord.Interaction):
     embed.description = """Slash Commands:
 </verify:1107825122947104828> - Get verified
 </invite:1108449958429982720> - Get a bot invite link
-</config_verfiedrole:1108369164361535560> - Set the server's verified role
+</config_verifiedrole:1108369164361535560> - Set the server's verified role
 </config_staffrole:1108376766059384992> - Set the server's staff role
 </config_logswebhook:1108834646231351418> - Set a webhook to be used for logging
 
