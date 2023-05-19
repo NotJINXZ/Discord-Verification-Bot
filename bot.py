@@ -234,6 +234,13 @@ async def verify(interaction: Interaction, member: discord.Member = None):
         user_id = str(member.id)
     else:
         user_id = str(interaction.user.id)
+
+    status = config["status"]
+    if status is False:
+        embed = error_embed("Sorry, the verification system is currently disabled in this server.")
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+        return
+
     user = interaction.guild.get_member(int(user_id))
     staffgrant = True if user_id != str(interaction.user.id) else False
 
