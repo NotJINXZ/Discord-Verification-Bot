@@ -307,18 +307,22 @@ async def verify(interaction: Interaction, member: discord.Member = None):
     if verified_role_id:
         if verified_role:
             if user:
-                if staffgrant:
-                    await user.add_roles(verified_role, reason="Verified role granted by staff")
-                    embed = success_embed(f"Verified role has been applied to the user: {user.mention} ({user.id})")
+                try:
+                    if staffgrant:
+                        await user.add_roles(verified_role, reason="Verified role granted by staff")
+                        embed = success_embed(f"Verified role has been applied to the user: {user.mention} ({user.id})")
+                        await interaction.response.send_message(embed=embed, ephemeral=True)
+                        # Log the action with staff user
+                        await log_action(server_id, "Successful Verification", user=interaction.user, description="User verification executed by staff")
+                    else:
+                        await user.add_roles(verified_role, reason="Verified role applied by member")
+                        embed = success_embed(f"You have been successfully verified.")
+                        await interaction.response.send_message(embed=embed, ephemeral=True)
+                        # Log the action with member user
+                        await log_action(server_id, "Successful Verification", user=user, description="User verification executed by member")
+                except discord.errors.Forbidden:
+                    embed = error_embed("Could not verify member. Please make sure I have sufficient permissions and my role is above the verified role.")
                     await interaction.response.send_message(embed=embed, ephemeral=True)
-                    # Log the action with staff user
-                    await log_action(server_id, "Successful Verification", user=interaction.user, description="User verification executed by staff")
-                else:
-                    await user.add_roles(verified_role, reason="Verified role applied by member")
-                    embed = success_embed(f"You have been successfully verified.")
-                    await interaction.response.send_message(embed=embed, ephemeral=True)
-                    # Log the action with member user
-                    await log_action(server_id, "Successful Verification", user=user, description="User verification executed by member")
             else:
                 embed = error_embed("The user could not be found. Please make sure the ID is correct.")
                 await interaction.response.send_message(embed=embed, ephemeral=True)
