@@ -100,8 +100,9 @@ async def rotate_status():
 
 async def log_action(server_id, action, user=None, description=None):
     webhook_url = get_logging_webhook_value(str(server_id))
-    if webhook_url is None:
+    if webhook_url is None or webhook_url == "":
         return None
+
     if user is None:
         username = "N/A"
         user_id = "N/A"
@@ -118,7 +119,7 @@ async def log_action(server_id, action, user=None, description=None):
     session = aiohttp.ClientSession()
     webhook = discord.Webhook.from_url(webhook_url, session=session)
     await webhook.send(embed=embed, username=f"{application_name} - Logging")
-    session.close()
+    await session.close()
     return True
 
 
@@ -197,7 +198,7 @@ async def initcmd(interaction: discord.Interaction):
 @app_commands.describe(member="The member to force verify (Staff Only)")
 async def verify(interaction: Interaction, member: discord.Member = None):
     server_id = interaction.guild.id
-
+    user_id = None
     x = find_empty_values(get_data_for_server(str(server_id)))
     if x is not None:
         # Check if the user has administrator permissions
@@ -235,14 +236,21 @@ async def verify(interaction: Interaction, member: discord.Member = None):
     else:
         user_id = str(interaction.user.id)
 
-    status = config["status"]
+    try:
+        status = config["status"]
+    except KeyError:
+        set_status(interaction.guild.id, True)
+        embed = success_embed("Updated config. Please rerun the command.")
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+        return
+    
     if status is False:
         embed = error_embed("Sorry, the verification system is currently disabled in this server.")
         await interaction.response.send_message(embed=embed, ephemeral=True)
         return
 
     user = interaction.guild.get_member(int(user_id))
-    staffgrant = True if user_id != str(interaction.user.id) else False
+    staffgrant = True if int(user_id) != int(interaction.user.id) else False
 
     url = f'{base_url}/discord/check_status?discord_id=' + user_id  # Replace with the actual URL
     headers = {'Authorization': auth_token}
@@ -257,6 +265,7 @@ async def verify(interaction: Interaction, member: discord.Member = None):
     except:
         rtoken = None
         renabled = None
+        rserver_id = None
         pass
 
     if verified_role in user.roles:
@@ -264,45 +273,48 @@ async def verify(interaction: Interaction, member: discord.Member = None):
         await interaction.response.send_message(embed=embed, ephemeral=True)
         return
 
-    if response.status_code != 200 or renabled == 1 and staffgrant is False:
-        if response.status_code == 404 or renabled == 1:
-            # Prepare headers with authentication, Discord ID, and Server ID
-            headers = {
-                'Authorization': auth_token,
-                'Discord-Id': str(user_id),
-                'Server-Id': str(server_id)
-            }
+    if response.status_code != 200 or renabled == 1:
+        if staffgrant is False:
+            if response.status_code == 404 or renabled == 1:
+                # Prepare headers with authentication, Discord ID, and Server ID
+                headers = {
+                    'Authorization': auth_token,
+                    'Discord-Id': str(user_id),
+                    'Server-Id': str(server_id)
+                }
 
-            # Make a GET request to the create_token endpoint
-            if rtoken is None:
-                response = requests.get(f'{base_url}/discord/create_token', headers=headers)
-            else:
-                response = requests.get(url, headers=headers)
-            print(response.json())
+                # Make a GET request to the create_token endpoint
+                if rtoken is None:
+                    response = requests.get(f'{base_url}/discord/create_token', headers=headers)
+                else:
+                    response = requests.get(url, headers=headers)
+                print(response.json())
 
-            # Check the response status code
-            if response.status_code == 200:
-                # Token creation successful
-                data = response.json()
-                token = data['token']
-                embed = success_embed(f"Successfully generated link.\nPlease verify at: {base_url}/discord/verify?token={token}")
-                await interaction.response.send_message(embed=embed, ephemeral=True)
-            else:
-                embed = error_embed("There was a problem creating your token. Please contact a developer.")
-                await interaction.response.send_message(embed=embed, ephemeral=True)
+                # Check the response status code
+                if response.status_code == 200:
+                    # Token creation successful
+                    data = response.json()
+                    token = data['token']
+                    embed = success_embed(f"Successfully generated link.\nPlease verify at: {base_url}/discord/verify?token={token}")
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
+                else:
+                    embed = error_embed("There was a problem creating your token. Please contact a developer.")
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
+                return
+        else:
+            pass
+        # embed = error_embed(f"Web server did not return code 200. Here is some info:\n```json\n{response}\n```")
+        # await interaction.response.send_message(embed=embed, ephemeral=True)
+        # return
+    
+    try: requests.post(url=f"{base_url}/discord/delete_token", headers={'Authorization': auth_token, "token": rtoken})
+    except: pass
+
+    if rserver_id is not None:
+        if rserver_id != server_id:
+            embed = error_embed("Server ID does not match. This usually occurs when you haven't finished verifying in a different server. It can usually be fixed by rerunning the command. If the problem persists, contact a developer.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
-
-        embed = error_embed(f"Web server did not return code 200. Here is some info:\n```json\n{response}\n```")
-        await interaction.response.send_message(embed=embed, ephemeral=True)
-        return
-
-    delete_url = f"{base_url}/discord/delete_token"
-    requests.post(url=delete_url, headers={'Authorization': auth_token, "token": rtoken})
-
-    if rserver_id != server_id:
-        embed = error_embed("Server ID does not match. This usually occurs when you haven't finished verifying in a different server. It can usually be fixed by rerunning the command. If the problem persists, contact a developer.")
-        await interaction.response.send_message(embed=embed, ephemeral=True)
-        return
 
     if verified_role_id:
         if verified_role:
