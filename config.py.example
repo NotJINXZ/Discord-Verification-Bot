@@ -4,6 +4,7 @@ token = "YOUR_BOT_TOKEN_HERE" # Bot Token
 base_url = "https://api.jinxz.dev" # Api base url
 auth_token = "YOUR_API_AUTH_TOKEN" # Backend authentication header token
 owner_id = "1037376739296432210" # Replace with your owner id
+mongo_connection_uri = "" # Replace with your mongodb connection uri
 # Status configuration
 statuses = ["github.com/NotJINXZ", "/verify", "Best verification bot!"]  # You may have as many statuses as you like. (It switches every 60s)
 status_type = "streaming"  # Choose the desired status type: competing, playing, streaming, listening, watching

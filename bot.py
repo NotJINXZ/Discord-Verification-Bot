@@ -76,6 +76,14 @@ async def on_ready():
     print("Server Count: {}".format(len(bot.guilds)))
     print("Member Count: {}".format(sum(len(guild.members) for guild in bot.guilds)))
 
+    for guild in bot.guilds:
+        server_id = str(guild.id)
+        server_data = get_data_for_server(server_id)
+
+        if not server_data:
+            create_or_update_entry(server_id, premium=False, status=True)
+            print(f"Created server data for guild '{guild.name}' with ID '{server_id}'")
+
     # for shard_id in bot.shard_ids:
     #     print("Shard ID: {}".format(shard_id))
     #     print("Shard Count: {}".format(bot.shard_count))

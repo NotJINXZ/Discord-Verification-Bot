@@ -1,94 +1,60 @@
-import json
+import pymongo
+from config import mongo_connection_uri
 
-def get_data():
-    with open("data.json", "r") as json_file:
-        return json.load(json_file)
+# Set up the MongoDB connection
+client = pymongo.MongoClient(mongo_connection_uri)
+db = client["main"]
+collection = db["servers"]
+
+def get_data(server_id):
+    data = collection.find_one({"server_id": server_id})
+    return data or {}
 
 def save_data(data):
-    with open("data.json", "w") as json_file:
-        json.dump(data, json_file)
+    collection.replace_one({"server_id": data["server_id"]}, data, upsert=True)
 
 def create_or_update_entry(server_id, staff_role_id="", verified_role_id="", premium=False, logging_webhook="", status=True):
-    # Load existing data from the JSON file
-    with open("data.json", "r") as json_file:
-        existing_data = json.load(json_file)
-
-    # Update or create a new entry for the server
-    existing_data[server_id] = {
-        "staff_role_id": staff_role_id,
-        "verified_role_id": verified_role_id,
-        "premium": premium,
-        "logging_webhook": logging_webhook,
-        "status": status
-    }
-
-    # Write the updated data back to the JSON file
-    with open("data.json", "w") as json_file:
-        json.dump(existing_data, json_file)
-
+    existing_data = get_data(server_id)
+    existing_data["server_id"] = server_id
+    existing_data["staff_role_id"] = staff_role_id
+    existing_data["verified_role_id"] = verified_role_id
+    existing_data["logging_webhook"] = logging_webhook
+    existing_data["premium"] = premium
+    existing_data["status"] = status
+    save_data(existing_data)
 
 def get_data_for_server(server_id):
-    # Load existing data from the JSON file
-    with open("data.json", "r") as json_file:
-        existing_data = json.load(json_file)
-
-    # Retrieve the data for the specified server ID
-    server_data = existing_data.get(server_id, None)
-    return server_data
+    data = get_data(server_id)
+    return data
 
 def delete_entry(server_id):
-    # Load existing data from the JSON file
-    with open("data.json", "r") as json_file:
-        existing_data = json.load(json_file)
-
-    # Check if the server_id exists in the data
-    if server_id in existing_data:
-        # Delete the entry for the specified server_id
-        del existing_data[server_id]
-
-        # Write the updated data back to the JSON file
-        with open("data.json", "w") as json_file:
-            json.dump(existing_data, json_file)
-        print(f"Entry for server '{server_id}' deleted successfully.")
-    else:
-        print(f"No entry found for server '{server_id}'.")
+    collection.delete_one({"server_id": server_id})
 
 def set_staff_role_id(server_id, staff_role_id):
-    data = get_data()
-    data[server_id]["staff_role_id"] = staff_role_id
+    data = get_data(server_id)
+    data["staff_role_id"] = staff_role_id
     save_data(data)
 
 def set_verified_role_id(server_id, verified_role_id):
-    data = get_data()
-    data[server_id]["verified_role_id"] = verified_role_id
+    data = get_data(server_id)
+    data["verified_role_id"] = verified_role_id
     save_data(data)
 
 def set_premium_status(server_id, premium_status):
-    data = get_data()
-    data[server_id]["premium"] = premium_status
+    data = get_data(server_id)
+    data["premium"] = premium_status
     save_data(data)
 
 def set_logging_webhook(server_id, logging_webhook):
-    data = get_data()
-    data[server_id]["logging_webhook"] = logging_webhook
+    data = get_data(server_id)
+    data["logging_webhook"] = logging_webhook
     save_data(data)
 
-def set_status(server_id: str | int, status: bool):
-    server_id = str(server_id)
-    data = get_data()
-    data[server_id]["status"] = status
+def set_status(server_id, status):
+    data = get_data(server_id)
+    data["status"] = status
     save_data(data)
 
 def get_logging_webhook_value(server_id):
-    with open("data.json", "r") as file:
-        json_data = json.load(file)
-
-    if json_data is None:
-        return None
-
-    server_data = json_data.get(server_id)
-    if server_data is None:
-        return None
-
-    logging_webhook_value = server_data.get("logging_webhook")
-    return logging_webhook_value
+    data = get_data(server_id)
+    return data.get("logging_webhook")
