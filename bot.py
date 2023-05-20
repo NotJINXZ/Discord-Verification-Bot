@@ -115,6 +115,16 @@ async def rotate_status():
     while True:
         new_status = next(status_cycle)
 
+        # Fetch server count
+        server_count = len(bot.guilds)
+
+        # Fetch member count from all guilds the bot is in
+        member_count = sum(len(guild.members) for guild in bot.guilds)
+
+        # Replace custom variables in the status text
+        new_status = new_status.replace('${server_count}', str(server_count))
+        new_status = new_status.replace('${member_count}', str(member_count))
+
         if status_type.lower() == "streaming":
             activity = discord.Streaming(name=new_status, url=streaming_url)
         else:
