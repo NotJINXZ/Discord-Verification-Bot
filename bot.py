@@ -139,7 +139,7 @@ async def rotate_status():
             activity = discord.Activity(type=getattr(discord.ActivityType, status_type), name=new_status)
 
         await bot.change_presence(activity=activity)
-        await asyncio.sleep(60)  # Change the interval as desired
+        await asyncio.sleep(30)  # Change the interval as desired
 
 
 async def log_action(server_id, action, user=None, description=None):
