@@ -406,19 +406,16 @@ def is_valid_webhook(webhook: str) -> bool:
     return True
 
 @bot.tree.command(name="config_logswebhook")
-@app_commands.commands.describe(webhook="The webhook that will be used for logging purposes.")
-async def config_logswebhook(interaction: discord.Interaction, webhook: str):
+@app_commands.commands.describe(channel="The channel where the webhook will be created for logging purposes.")
+async def config_logswebhook(interaction: discord.Interaction, channel: discord.TextChannel):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(embed=error_embed("You do not have permission to run this command."), delete_after=10)
         return
 
-    if not is_valid_webhook(webhook):
-        await interaction.response.send_message(embed=error_embed("Invalid webhook format."), ephemeral=True)
-        return
+    webhook = await channel.create_webhook(name=f"{application_name} - Logging", avatar="https://beta.jinxz.dev/u/pSv5U9.jpg")
+    set_logging_webhook(str(interaction.guild.id), str(webhook.url))
 
-    set_logging_webhook(str(interaction.guild.id), str(webhook))
-
-    await interaction.response.send_message(embed=success_embed(f"Successfully set the logging webhook to:\n{webhook}"), ephemeral=True)
+    await interaction.response.send_message(embed=success_embed(f"Successfully created and set the logging webhook in channel {channel.mention}"), ephemeral=True)
     return
 
 @bot.tree.command(name="invite", description="Get an invite link for the bot!")
