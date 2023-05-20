@@ -6,6 +6,6 @@ auth_token = "YOUR_API_AUTH_TOKEN" # Backend authentication header token
 owner_id = "1037376739296432210" # Replace with your owner id
 mongo_connection_uri = "" # Replace with your mongodb connection uri
 # Status configuration
-statuses = ["github.com/NotJINXZ", "/verify", "Best verification bot!", "${member_count} members in {$server_count} servers"]  # You may have as many statuses as you like. (It switches every 60s). You may use these as well: ${server_count} and ${member_count}
+statuses = ["github.com/NotJINXZ", "/verify", "Best verification bot!", "${member_count} members in {$server_count} servers"]  # You may have as many statuses as you like. (It switches every 60s). You may use these as well: ${server_count} and ${member_count}. You can also specify different types for each status using something like this: "/verify:::watching"
 status_type = "streaming"  # Choose the desired status type: competing, playing, streaming, listening, watching
 streaming_url = "https://www.twitch.tv/its_jinxz"  # Replace with your streaming URL if applicable

@@ -114,6 +114,7 @@ async def on_ready():
 async def rotate_status():
     while True:
         new_status = next(status_cycle)
+        status_parts = new_status.split(":::")
 
         # Fetch server count
         server_count = len(bot.guilds)
@@ -122,13 +123,20 @@ async def rotate_status():
         member_count = sum(len(guild.members) for guild in bot.guilds)
 
         # Replace custom variables in the status text
-        new_status = new_status.replace('${server_count}', str(server_count))
+        new_status = status_parts[0].replace('${server_count}', str(server_count))
         new_status = new_status.replace('${member_count}', str(member_count))
 
-        if status_type.lower() == "streaming":
+        # Determine the status type
+        if len(status_parts) > 1:
+            status_type = status_parts[1]
+        else:
+            status_type = status_type.lower()
+
+        # Set the appropriate activity based on the status type
+        if status_type == "streaming":
             activity = discord.Streaming(name=new_status, url=streaming_url)
         else:
-            activity = discord.Game(name=new_status)
+            activity = discord.Activity(type=getattr(discord.ActivityType, status_type), name=new_status)
 
         await bot.change_presence(activity=activity)
         await asyncio.sleep(60)  # Change the interval as desired
