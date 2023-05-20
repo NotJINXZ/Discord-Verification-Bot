@@ -29,12 +29,30 @@ if not os.path.exists("data.json"):
     with open("data.json", "w") as file:
         json.dump({}, file)
 
-def success_embed(description):
+def success_embed(description: str) -> discord.Embed:
+    """
+    Create an embedded message indicating a successful operation.
+
+    Parameters:
+    - description (str): The description of the success message.
+
+    Returns:
+    - discord.Embed: The embedded message indicating success.
+    """
     embed = discord.Embed(title="Operation completed successfully", description=f"{str(success_emoji)} - {description}")
     embed.set_footer(text=f"{application_name} - Developed by {bot_developer}")
     return embed
 
-def error_embed(description):
+def error_embed(description: str) -> discord.Embed:
+    """
+    Create an embedded message indicating an error or failed operation.
+
+    Parameters:
+    - description (str): The description of the error message.
+
+    Returns:
+    - discord.Embed: The embedded message indicating an error.
+    """
     embed = discord.Embed(title="Operation failed", description=f"{str(error_emoji)} - {description}")
     embed.set_footer(text=f"{application_name} - Developed by {bot_developer}")
     return embed
@@ -366,6 +384,11 @@ async def config_verifiedrole(interaction: discord.Interaction, role: discord.Ro
         embed = error_embed("You do not have permission to run this command.")
         await interaction.response.send_message(embed=embed, delete_after=10)
         return
+    
+    if role.name == "@everyone":
+        embed = error_embed("Invalid role. Please specify a role other than @everyone.")
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+        return
 
     set_verified_role_id(str(interaction.guild.id), str(role.id))
 
@@ -378,6 +401,11 @@ async def config_staffrole(interaction: discord.Interaction, role: discord.Role)
     if not interaction.user.guild_permissions.administrator:
         embed = error_embed("You do not have permission to run this command.")
         await interaction.response.send_message(embed=embed, delete_after=10)
+        return
+
+    if role.name == "@everyone":
+        embed = error_embed("Invalid role. Please specify a role other than @everyone.")
+        await interaction.response.send_message(embed=embed, ephemeral=True)
         return
 
     set_staff_role_id(str(interaction.guild.id), str(role.id))
@@ -575,23 +603,6 @@ async def setup(ctx):
 
     await ctx.send(reply_message)
 
-@bot.tree.command(name="help", description="Display a list of commands")
-async def help(interaction: discord.Interaction):
-    embed = discord.Embed()
-    embed.description = """Slash Commands:
-</verify:1107825122947104828> - Get verified
-</invite:1108449958429982720> - Get a bot invite link
-</config_verifiedrole:1108369164361535560> - Set the server's verified role
-</config_staffrole:1108376766059384992> - Set the server's staff role
-</config_logswebhook:1108834646231351418> - Set a webhook to be used for logging
-</status:1108932074687172689> - Change the status of the verification system. (Enable/Disable it)
-
-Other Commands:
-?howto - Display an embed telling users how to verify
-?setup #channel - Set permissions (This command is risky and may expose private channels. Use at own risk)"""
-
-    await interaction.response.send_message(embed=embed, ephemeral=True)
-    return
 
 @bot.tree.command(name="status", description="Enable / Disable the verification system.")
 @app_commands.describe(status = "True = Enable, False = Disable")
@@ -605,5 +616,22 @@ async def status(interaction: discord.Interaction, status: bool):
     await interaction.response.send_message(embed=embed)
     return
 
+@bot.tree.command(name="help", description="Display a list of commands")
+async def help(interaction: discord.Interaction):
+    embed = discord.Embed()
+    embed.description = """Slash Commands:
+</verify:1107825122947104828> - Get verified
+</invite:1108449958429982720> - Get a bot invite link
+</config_verifiedrole:1108369164361535560> - Set the server's verified role
+</config_staffrole:1108376766059384992> - Set the server's staff role
+</config_logswebhook:1108834646231351418> - Set a channel to use for logging
+</status:1108932074687172689> - Change the status of the verification system. (Enable/Disable it)
+
+Other Commands:
+?howto - Display an embed telling users how to verify
+?setup #channel - Set permissions (This command is risky and may expose private channels. Use at own risk)"""
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+    return
 
 bot.run(token)
