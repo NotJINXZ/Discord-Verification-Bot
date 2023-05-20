@@ -58,3 +58,18 @@ def set_status(server_id, status):
 def get_logging_webhook_value(server_id):
     data = get_data(server_id)
     return data.get("logging_webhook")
+
+def increment_total_verifications(server_id):
+    data = collection.find_one({"server_id": server_id})
+    if not data:
+        # Server document does not exist, create a new one
+        data = {
+            "server_id": server_id,
+            "total_verifications": 1
+        }
+    else:
+        # Increment the existing total_verifications field by 1
+        data["total_verifications"] = data.get("total_verifications", 0) + 1
+
+    # Save the updated document
+    collection.replace_one({"server_id": server_id}, data, upsert=True)

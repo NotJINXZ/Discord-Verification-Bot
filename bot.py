@@ -334,12 +334,16 @@ async def verify(interaction: Interaction, member: discord.Member = None):
                         await interaction.response.send_message(embed=embed, ephemeral=True)
                         # Log the action with staff user
                         await log_action(server_id, "Successful Verification", user=interaction.user, description="User verification executed by staff")
+                        increment_total_verifications(server_id)
+                        return
                     else:
                         await user.add_roles(verified_role, reason="Verified role applied by member")
                         embed = success_embed(f"You have been successfully verified.")
                         await interaction.response.send_message(embed=embed, ephemeral=True)
                         # Log the action with member user
                         await log_action(server_id, "Successful Verification", user=user, description="User verification executed by member")
+                        increment_total_verifications(server_id)
+                        return
                 except discord.errors.Forbidden:
                     embed = error_embed("Could not verify member. Please make sure I have sufficient permissions and my role is above the verified role.")
                     await interaction.response.send_message(embed=embed, ephemeral=True)
