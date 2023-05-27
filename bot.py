@@ -113,6 +113,7 @@ async def on_ready():
 
 async def rotate_status():
     while True:
+        from config import status_type
         new_status = next(status_cycle)
         status_parts = new_status.split(":::")
 
@@ -469,7 +470,7 @@ async def config_logswebhook(interaction: discord.Interaction, channel: discord.
         await interaction.response.send_message(embed=error_embed("You do not have permission to run this command."), delete_after=10)
         return
 
-    webhook = await channel.create_webhook(name=f"{application_name} - Logging", avatar="https://beta.jinxz.dev/u/pSv5U9.jpg")
+    webhook = await channel.create_webhook(name=f"{application_name} - Logging")
     set_logging_webhook(str(interaction.guild.id), webhook.url)
 
     await interaction.response.send_message(embed=success_embed(f"Successfully created and set the logging webhook in channel {channel.mention}"), ephemeral=True)
