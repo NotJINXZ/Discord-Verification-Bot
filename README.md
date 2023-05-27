@@ -27,8 +27,9 @@ The bot supports the following commands:
 - `?sync`: Sync all slash commands.
 - `/init`: Create JSON data for a guild if it does not exist.
 - `?howto`: Provides instructions on how to verify.
-- `?setup`: Runs the setup process for channel permissions (admin-only).
+- `?setup <channel>`: Runs the setup process for channel permissions (admin-only).
 - `/invite`: Get an invite link for the bot.
+- `/status <bool>`: Enable/Disable the verification system
 
 Additionally, the bot handles slash commands for verification (`/verify`) and configuration (`/config_verifiedrole`, `/config_staffrole`, `/config_logswebhook`).
 
