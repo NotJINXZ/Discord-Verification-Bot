@@ -9,3 +9,7 @@ mongo_connection_uri = "" # Replace with your mongodb connection uri
 statuses = ["github.com/NotJINXZ", "/verify", "Best verification bot!", "${member_count} members in {$server_count} servers"]  # You may have as many statuses as you like. (It switches every 60s). You may use these as well: ${server_count} and ${member_count}. You can also specify different types for each status using something like this: "/verify:::watching"
 status_type = "streaming"  # Choose the desired status type: competing, playing, streaming, listening, watching
 streaming_url = "https://www.twitch.tv/its_jinxz"  # Replace with your streaming URL if applicable
+# Automatic guild updater for bot lists.
+statsupdater_enabled = False
+botsgg_token = "" # discord.bots.gg
+botsfordiscord_token = "" # botsfordiscord.com

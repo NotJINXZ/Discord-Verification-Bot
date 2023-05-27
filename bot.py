@@ -141,6 +141,17 @@ async def rotate_status():
         await bot.change_presence(activity=activity)
         await asyncio.sleep(30)  # Change the interval as desired
 
+async def guild_updater():
+    if not statsupdater_enabled:
+        return
+    
+    if botsgg_token and botsgg_token != "":
+        requests.post(f"https://discord.bots.gg/api/v1/bots/{bot.user.id}/stats", json={"guildCount": bot.guilds.count}, headers={"Content-Type": "application/json", "Authorization": statsupdater_enabled(botsgg_token)})
+
+    if botsfordiscord_token and botsfordiscord_token != "":
+        requests.post(f"https://discords.com/bots/api/bot/" + str(bot.user.id), json={"server_count": bot.guilds.count}, headers={"Authorization": str(botsfordiscord_token)})
+
+    await asyncio.sleep(600)
 
 async def log_action(server_id, action, user=None, description=None):
     webhook_url = get_logging_webhook_value(str(server_id))
@@ -395,7 +406,7 @@ async def verify(interaction: Interaction, member: discord.Member = None):
         await interaction.response.send_message(embed=embed, ephemeral=True)
         return
 
-@bot.tree.command(name="config_verifiedrole")
+@bot.tree.command(name="config_verifiedrole", description="Set a role to be given apon successful verification.")
 @app_commands.commands.describe(role="The verified role to give.")
 async def config_verifiedrole(interaction: discord.Interaction, role: discord.Role):
     if not interaction.user.guild_permissions.administrator:
@@ -413,7 +424,7 @@ async def config_verifiedrole(interaction: discord.Interaction, role: discord.Ro
     embed = success_embed(f"Successfully linked the role: {role.mention}.")
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="config_staffrole")
+@bot.tree.command(name="config_staffrole", description="Set a role to be used for staff.")
 @app_commands.commands.describe(role="The staff role (Will have access to most features)")
 async def config_staffrole(interaction: discord.Interaction, role: discord.Role):
     if not interaction.user.guild_permissions.administrator:
@@ -451,7 +462,7 @@ def is_valid_webhook(webhook: str) -> bool:
 
     return True
 
-@bot.tree.command(name="config_logswebhook")
+@bot.tree.command(name="config_logswebhook", description="Set a channel to be used for logging")
 @app_commands.commands.describe(channel="The channel where the webhook will be created for logging purposes.")
 async def config_logswebhook(interaction: discord.Interaction, channel: discord.TextChannel):
     if not interaction.user.guild_permissions.administrator:
@@ -459,7 +470,7 @@ async def config_logswebhook(interaction: discord.Interaction, channel: discord.
         return
 
     webhook = await channel.create_webhook(name=f"{application_name} - Logging", avatar="https://beta.jinxz.dev/u/pSv5U9.jpg")
-    set_logging_webhook(str(interaction.guild.id), str(webhook.url))
+    set_logging_webhook(str(interaction.guild.id), webhook.url)
 
     await interaction.response.send_message(embed=success_embed(f"Successfully created and set the logging webhook in channel {channel.mention}"), ephemeral=True)
     return
